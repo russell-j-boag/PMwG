@@ -1,5 +1,5 @@
 ---
-title: "Tutorial script for multiple-task joint modeling with PMwG"
+title: "Tutorial script for multiple-task joint modeling with the PMwG sampler"
 output:
   html_document:
     df_print: paged
