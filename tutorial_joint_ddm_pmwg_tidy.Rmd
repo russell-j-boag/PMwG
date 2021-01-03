@@ -3,7 +3,7 @@ title: "Tutorial script for multiple-task joint modeling with the PMwG sampler"
 author: ""
 output: html_document
 ---
-```{r}
+```{r, echo = FALSE}
 knitr::opts_chunk$set( 
   eval = FALSE,
   echo = TRUE
