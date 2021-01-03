@@ -292,7 +292,7 @@ ll_t1_ddm <- function(x, data, sample = FALSE) {
 
 
 ## Test likelihood function 
-# Here we check that out likelihood function returns the expected items 
+# Here we check that our likelihood function returns the expected items 
 # (i.e., a simulated data frame or a summed log-likelihood).
 
 ##### Simulate data from the design matrix
