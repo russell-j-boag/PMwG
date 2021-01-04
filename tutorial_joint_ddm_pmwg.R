@@ -9,7 +9,7 @@
 # modification and to let users 'plug in' their own experimental designs 
 # and models as straightforwardly as possible.
 
-##### The building blocks
+#### The building blocks
 # The script starts by creating an experimental design matrix (an N x M 
 # data frame representing N trials of M experimental factors). The design 
 # matrix encodes the features of the experimental design (e.g., subject, 
@@ -23,7 +23,7 @@
 # likelihood and sampling functions for different purposes (e.g., fitting 
 # to data, simulating out of a model, generating hypothetical data). 
                            
-##### The likelihood function
+#### The likelihood function
 # At the heart of this code is the likelihood function. The likelihood
 # function iterates over each trial in the design and computes either 
 # 1) the likelihood of the current observation in `data` given the current 
@@ -38,7 +38,7 @@
 # 'vectorizing' over observations that share a cell in the design matrix 
 # (e.g., with a single call to `dLBA()`, `dnorm()`, `ddiffusion()`, etc.). 
 # However, the loop method has the advantage of being more intuitive and 
-# easier to debug in in the initial stages of writing a model (despite its
+# easier to debug in the initial stages of writing a model (despite its
 # longer compute time). 
 #
 # Constructing a joint likelihood (e.g., the likelihood of N models of N 
@@ -51,7 +51,7 @@
 # single case and are returned as a list of data frames (one for each 
 # task/model) at the end of the function. 
 
-##### The sampler
+#### The sampler
 # Running the Particle Metropolis within Gibbs (PMwG) sampler is 
 # straightforward - you simply pass the `data` (or `sims`) object, the 
 # likelihood function, and a vector of parameter names as arguments. 
@@ -76,28 +76,28 @@
 
 ## Setup environment 
 
-##### Clear workspace
+#### Clear workspace
 rm(list=ls())
 
-##### Set working directory
+#### Set working directory
 getwd()
 main_dir <- c("~/Documents/Github/PMwG")
 setwd(file.path(main_dir))
 
-##### Create subdirectory structure 
+#### Create subdirectory structure 
 # This will not overwrite if dir already exists.
 sub_dirs <- list("samples", "plots", "data")
 lapply(sub_dirs, function (x) dir.create(file.path(main_dir, x), showWarnings = FALSE))
 
-##### Load packages
+#### Load packages
 library(tidyverse)
 library(rtdists)
 library(pmwg)
 
-##### Set seed for random number reproducibility
+#### Set seed for random number reproducibility
 set.seed(101)
 
-##### Create some empty storage objects
+#### Create some empty storage objects
 design <- list()
 data <- list()
 p_names <- list()
@@ -125,7 +125,7 @@ sims <- list()
 # task/model separately. We will combine them in the final step once we are
 # confident the individual pieces each work correctly. 
 
-##### Make experimental design matrix for Task 1
+#### Make experimental design matrix for Task 1
 # Here we create an N x M data frame of our experimental design. 
 # Each row represents one observation or trial and each column is a factor 
 # whose levels code the experimental conditions for each trial. 
@@ -151,7 +151,7 @@ design$t1
 # with column names and factor levels that match those in your likelihood 
 # function. 
 
-##### Create a vector of parameter names
+#### Create a vector of parameter names
 # Now we want to create a named vector containing all the unique estimated
 # parameters in our design. First we extract the factor levels over which 
 # the parameters will vary. This is done by passing a vector of factor 
@@ -169,7 +169,7 @@ p_names$t1 <- c(str_c("t1.a", unique(design$t1$cond1), sep = "."),
 )
 p_names$t1
 
-##### Set mean parameter values to simulate from (or to use as priors)
+#### Set mean parameter values to simulate from (or to use as priors)
 # Note that (for now) the values of unestimated constants are set inside
 # the likelihood function.
 p_vector$t1 <- c(2.0, 3.0,  # a's
@@ -204,7 +204,7 @@ names(p_vector$t1)
 # `data$t2_BOLD`). Then refer to it by that name when writing the 
 # likelihood function.
 
-##### Likelihood function for diffusion model of Task 1
+#### Likelihood function for diffusion model of Task 1
 ll_t1_ddm <- function(x, data, sample = FALSE) {
   # This function takes the following inputs:
   # 1. x = the (log of) a named vector of starting parameters.
@@ -295,14 +295,14 @@ ll_t1_ddm <- function(x, data, sample = FALSE) {
 # Here we check that our likelihood function returns the expected items 
 # (i.e., a simulated data frame or a summed log-likelihood).
 
-##### Simulate data from the design matrix
+#### Simulate data from the design matrix
 sims$t1 <- ll_t1_ddm(x = log(p_vector$t1), 
                      data = design, 
                      sample = TRUE
 )
 sims$t1
 
-##### Return likelihood
+#### Return likelihood
 ll_t1_ddm(x = log(p_vector$t1), 
           data = sims, 
           sample = FALSE
@@ -312,25 +312,25 @@ ll_t1_ddm(x = log(p_vector$t1),
 
 ## Explore data
 
-##### Load data
+#### Load data
 # Here we would usually read in and tidy up our empirical data to get it 
 # into a similar format as the data frame we just simulated and stored in 
 # `sims`. For now let's just use the simulated data as our `data`. 
 data <- sims
 data$t1
 
-##### Cell counts
+#### Cell counts
 table(data$t1$stim, data$t1$cond1)
 
-##### Mean RT
+#### Mean RT
 data$t1 %>% 
   group_by(stim, cond1) %>% 
   summarise(rt = mean(rt))
 
-##### RT histogram
+#### RT histogram
 data$t1 %>%
   ggplot(aes(x = rt, fill = stim)) +
-  geom_histogram(stat = 'bin') +
+  geom_histogram(stat = "bin") +
   facet_wrap(. ~ cond1) +
   scale_x_continuous(limits = c(0, 3)) +
   theme_minimal()
@@ -342,7 +342,7 @@ data$t1 %>%
 
 ## Setup Task 2
 
-##### Make experimental design matrix for Task 2
+#### Make experimental design matrix for Task 2
 n_subs_t2 <- 5
 n_obs_t2 <- 40
 design$t2 <- expand_grid(subject = factor(rep(1:n_subs_t2, each = n_obs_t2)), 
@@ -351,14 +351,14 @@ design$t2 <- expand_grid(subject = factor(rep(1:n_subs_t2, each = n_obs_t2)),
 )
 design$t2
 
-##### Create a vector of parameter names
+#### Create a vector of parameter names
 p_names$t2 <- c(str_c("t2.a", unique(design$t2$cond1), sep = "."),
                 str_c("t2.v", unique(design$t2$cond1), sep = "."),
                 str_c("t2.t0", sep = ".")
                 )
 p_names$t2
 
-##### Set mean parameter values to simulate from (or to use as priors)
+#### Set mean parameter values to simulate from (or to use as priors)
 # Note that (for now) the values of unestimated constants are set inside
 # the likelihood function.
 # Here we will just set them to half of model 1's values.
@@ -372,7 +372,7 @@ p_vector$t2
 
 ## Likelihood function Task 2 
 
-##### Likelihood function for diffusion model of Task 2
+#### Likelihood function for diffusion model of Task 2
 ll_t2_ddm <- function(x, data, sample = FALSE) {
   # This function takes the following inputs:
   # 1. x = the (log of) a named vector of starting parameters.
@@ -456,14 +456,14 @@ ll_t2_ddm <- function(x, data, sample = FALSE) {
 
 ## Test likelihood function 
 
-##### Simulate data from the design matrix
+#### Simulate data from the design matrix
 sims$t2 <- ll_t2_ddm(x = log(p_vector$t2), 
                      data = design, 
                      sample = TRUE
 )
 sims$t2
 
-##### Return likelihood
+#### Return likelihood
 ll_t2_ddm(x = log(p_vector$t2), 
           data = sims, 
           sample = FALSE
@@ -475,18 +475,18 @@ ll_t2_ddm(x = log(p_vector$t2),
 data <- sims
 data$t2
 
-##### Cell counts
+#### Cell counts
 table(data$t2$stim, data$t2$cond1)
 
-##### Mean RT
+#### Mean RT
 data$t2 %>% 
   group_by(stim, cond1) %>% 
   summarise(rt = mean(rt))
 
-##### RT histogram
+#### RT histogram
 data$t2 %>%
   ggplot(aes(x = rt, fill = stim)) +
-  geom_histogram(stat = 'bin') +
+  geom_histogram(stat = "bin") +
   facet_wrap(. ~ cond1) +
   scale_x_continuous(limits = c(0, 3)) +
   theme_minimal()
@@ -497,17 +497,17 @@ data$t2 %>%
 # Now we are ready to combine the two models into a single likelihood. 
 # First let's make a combined parameter vector containing all parameters.
 
-##### Make combined parameter vector
+#### Make combined parameter vector
 p_vector <- c(p_vector$t1, p_vector$t2)
 p_vector
 
 ## Setup for sampling  
 
-##### Get the names of the parameters we want to sample
+#### Get the names of the parameters we want to sample
 pars <- names(p_vector)
 pars
 
-##### Set priors for the mean and variance of hyper-level multivariate normal
+#### Set priors for the mean and variance of hyper-level multivariate normal
 priors <- list(
   theta_mu_mean = rep(0, length(pars)),
   theta_mu_var = diag(rep(1, length(pars)))
@@ -516,7 +516,7 @@ priors
 
 ## Joint likelihood function 
 
-##### Likelihood function for joint diffusion model of Tasks 1 & 2
+#### Likelihood function for joint diffusion model of Tasks 1 & 2
 ll_joint_ddm <- function(x, data, sample = FALSE) {
   # This function takes the following inputs:
   # 1. x = the (log of) a named vector of starting parameters
@@ -642,17 +642,17 @@ ll_joint_ddm <- function(x, data, sample = FALSE) {
 
 ## Test likelihood function 
 
-##### Simulate data from the design matrix
+#### Simulate data from the design matrix
 sims <- ll_joint_ddm(x = log(p_vector), data = data, sample = TRUE)
 sims
 
-##### Return likelihood
+#### Return likelihood
 ll_joint_ddm(x = log(p_vector), data = sims, sample = FALSE)
 
 
 ## Setup sampling
 
-##### Initialize sampler
+#### Initialize sampler
 sampler <- pmwgs(
   data = data,
   pars = pars,
@@ -660,13 +660,13 @@ sampler <- pmwgs(
   ll_func = ll_joint_ddm
 )
 
-##### Set start points (optional)
+#### Set start points (optional)
 start_points <- list(
   mu = log(p_vector),
   sig2 = diag(rep(.01, length(pars)))
 )
 
-##### Initialize start points
+#### Initialize start points
 sampler <- init(
   sampler, 
   start_mu = start_points$mu,
@@ -678,7 +678,7 @@ sampler <- init(
 # Note that for large models, the following stages are best run in parallel
 # on a research computing/server grid.
 
-##### Stage 1: Burn-in
+#### Stage 1: Burn-in
 burned <- run_stage(
   sampler, 
   stage = "burn",
@@ -688,7 +688,7 @@ burned <- run_stage(
   n_cores = 10
 )
 
-##### Stage 2: Adaptation
+#### Stage 2: Adaptation
 adapted <- run_stage(
   burned, 
   stage = "adapt", 
@@ -698,7 +698,7 @@ adapted <- run_stage(
   n_cores = 10
 )
 
-##### Stage 3: Sampling
+#### Stage 3: Sampling
 sampled <- run_stage(
   adapted, 
   stage = "sample",
@@ -708,7 +708,7 @@ sampled <- run_stage(
   n_cores = 10
 )
 
-##### Save to samples directory
+#### Save to samples directory
 save(sampled, file = "samples/samples_ddm_combined_test.RData")
 
 # See https://newcastlecl.github.io/samplerDoc/ for further information
