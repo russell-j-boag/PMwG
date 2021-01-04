@@ -833,11 +833,7 @@ save(sampled, file = "samples/samples_ddm_combined_test.RData")
 
 ## Next steps
 
-<<<<<<< HEAD
 Now that we have our samples, we can run sampling diagnostics, check
-=======
-Now that we have our samples, we can run sampling diagnositics, check
->>>>>>> 74a029b0130a8ab8b2e0c58364107d5bc5e97785
 model fit by simulating posterior predictives, and explore relationships
 between parameters for different tasks and models. Future versions of
 this tutorial will include convenience functions and example code for
