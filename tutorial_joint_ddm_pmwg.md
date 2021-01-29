@@ -636,9 +636,11 @@ ll_joint_ddm <- function(x, data, sample = FALSE) {
   
   # Undo the log transform
   x <- exp(x) 
-  # If being used as part of the pmwg package (on one subject), extract the df (list of tibbles)
-  # and repace the data variable with this, otherwise continue.
+  
+  # If being used as part of the pmwg package (on one subject), extract the 
+  # df (list of tibbles) and repace data, otherwise continue
   if (is_tibble(data)) data <- data$df[[data$subject]]
+  
   # Perform parameter checks 
   # Task 1 checks
   if (any(data$t1$rt < x["t1.t0"])) {
@@ -770,12 +772,19 @@ ll_joint_ddm(x = log(joint_p_vector),
 ```
 
 ## Setup sampling
-#### Rearrange Data for pmwg sampler
-The pmwg sampler expects data in a data.frame like format (square) with a column called `subject`. Thus in order to use the data with the samplers package it needs to be rearranged.
 
-Here we split bind the rows together and add a new column representing the task, then split them by subject and transform the resulting list to a tibble with two columns, `subject` as required by pmwg and `df` for the data associated with that subject.
+#### Rearrange `data` for `pmwg` sampler
 
-Finally we use a helper function to split each tibble in the `df` column into a list with two elements, one tibble for each dataset.
+The `pmwg` sampler expects `data` to be in data.frame format (square)
+with a column called `subject`. Thus we need to rearrange our data list.
+
+Here we bind the rows together and add a new column representing the
+task, then split them by subject and transform the resulting list to a
+tibble with two columns, `subject` as required by pmwg and `df` for the
+data associated with that subject.
+
+We then use a helper function `split_tibble` to split each tibble in the
+`df` column into a list with two elements, one tibble for each dataset.
 
 ``` r
 split_tibble <- function(x) {
